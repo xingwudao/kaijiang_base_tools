@@ -21,7 +21,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include "CTrieTree.h"
+#include "./data-structure/trie-tree.hpp"
 
 using namespace std;
 

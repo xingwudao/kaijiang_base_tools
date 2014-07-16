@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdint.h>
-#include "CTrieTree.h"
+#include "./data-structure/trie-tree.hpp"
 using namespace std;
 
 namespace kaijiang
