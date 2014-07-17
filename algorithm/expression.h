@@ -59,17 +59,17 @@ namespace kaijiang
 	}ExpressionItem;
 
 	// 后缀表达式类
-	class CPostfixExpression
+	class Expression
 	{
 		public:
 			// 默认构造
-			CPostfixExpression();
+			Expression();
 			// 拷贝构造
-			CPostfixExpression(const CPostfixExpression& other);
+			Expression(const Expression& other);
 			// 赋值操作符
-			CPostfixExpression& operator=(const CPostfixExpression& other);
+			Expression& operator=(const Expression& other);
 			// 析构函数
-			virtual ~CPostfixExpression();
+			virtual ~Expression();
 
 			// 说明：加入一个表达式元素
 			// 参数：
@@ -94,7 +94,7 @@ namespace kaijiang
 			//  [IN] Oper -- 后缀表达式
 			// 返回：
 			//  输出流
-			//friend ostream& operator<<(ostream& os, const CPostfixExpression& Oper);
+			//friend ostream& operator<<(ostream& os, const Expression& Oper);
 			ostream& print(ostream& os);
 
 			// 说明：操作数个数
@@ -145,23 +145,23 @@ namespace kaijiang
 			map<string, float> constant_float;
 			map<string, int32_t> constant_int;
 	};
-	//ostream& operator<<(ostream& os, const CPostfixExpression& Oper);
+	//ostream& operator<<(ostream& os, const Expression& Oper);
 
 	// 表达式解析类
-	class CExpressionParser
+	class ExpressionParser
 	{
 		public:
 			// 说明：构造函数和西沟函数
-			CExpressionParser();
-			~CExpressionParser();
+			ExpressionParser();
+			~ExpressionParser();
 
 			// 说明：解析一个中缀表达式，表达式
 			// 参数：
 			//  [IN] strNifixExp -- 中缀表达式
 			// 返回：
 			//  后缀表达式指针，如果解析失败则返回NULL
-			CPostfixExpression* ParseNifixExp(const string& strNifixExp);
+			Expression* Parse(const string& strNifixExp);
 	};
-	//ostream& operator<<(ostream& os, const CPostfixExpression& Oper);
+	//ostream& operator<<(ostream& os, const Expression& Oper);
 };
 #endif

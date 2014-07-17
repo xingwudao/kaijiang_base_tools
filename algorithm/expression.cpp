@@ -277,9 +277,9 @@ string GetOperatorName(OperatorType OperateType)
 	}
 }
 
-// 说明：CExpressionParser对象的流输出操作符重载
-//ostream& operator<<(ostream& os, const CPostfixExpression& Oper)
-ostream& CPostfixExpression::print(ostream& os)
+// 说明：ExpressionParser对象的流输出操作符重载
+//ostream& operator<<(ostream& os, const Expression& Oper)
+ostream& Expression::print(ostream& os)
 {
 	for(unsigned int index = 0; index < m_vecPostfixExp.size(); index++)
 	{
@@ -298,11 +298,11 @@ ostream& CPostfixExpression::print(ostream& os)
 }
 
 ////////////////////////////////////////////
-//CExpressionParser 类方法实现：
+//ExpressionParser 类方法实现：
 
 
 // 说明：构造函数
-CExpressionParser::CExpressionParser()
+ExpressionParser::ExpressionParser()
 {
 	InitializePriority();
 	InitializeOperChar();
@@ -310,16 +310,16 @@ CExpressionParser::CExpressionParser()
 }
 
 // 说明：西沟函数
-CExpressionParser::~CExpressionParser()
+ExpressionParser::~ExpressionParser()
 {
 }
 
 
 // 说明：解析中缀表达式,转换成方便运算的后缀表达式
-CPostfixExpression* CExpressionParser::ParseNifixExp(const string& strNifixExp)
+Expression* ExpressionParser::Parse(const string& strNifixExp)
 {
 	// 后缀表达式
-	CPostfixExpression* pPostfixExpression = new CPostfixExpression;
+	Expression* pPostfixExpression = new Expression;
 	string strOperand;//操作数
 	stack<OperatorType> stackOperator;
 	ExpressionItemType LastItemType = UNKNOWN_ITEM_TYPE; 
@@ -564,16 +564,16 @@ CPostfixExpression* CExpressionParser::ParseNifixExp(const string& strNifixExp)
 }
 
 //////////////////////////////////////////////////////
-// 类CPostfixExpression的方法实现
+// 类Expression的方法实现
 // 说明：构造函数
-CPostfixExpression::CPostfixExpression()
+Expression::Expression()
 {
 	m_unOperands = 0;
 	operands = new CTrieTree<uint32_t>;
 }
 
 // 说明：拷贝构造
-CPostfixExpression::CPostfixExpression(const CPostfixExpression& other)
+Expression::Expression(const Expression& other)
 {
 	operands = new CTrieTree<uint32_t>(*(other.operands));
 	m_unOperands = other.m_unOperands;
@@ -603,7 +603,7 @@ CPostfixExpression::CPostfixExpression(const CPostfixExpression& other)
 }
 
 // 说明：赋值操作符
-CPostfixExpression& CPostfixExpression::operator=(const CPostfixExpression& other)
+Expression& Expression::operator=(const Expression& other)
 {
 	if(&other == this) return *this;
 	this->m_unOperands = other.m_unOperands;
@@ -651,7 +651,7 @@ CPostfixExpression& CPostfixExpression::operator=(const CPostfixExpression& othe
 }
 
 // 说明：析构函数
-CPostfixExpression::~CPostfixExpression()
+Expression::~Expression()
 {
 	for(unsigned int index = 0; index < m_vecPostfixExp.size(); index++)
 	{
@@ -669,7 +669,7 @@ CPostfixExpression::~CPostfixExpression()
 		delete operands;
 }
 
-uint32_t CPostfixExpression::GetOperandCode(const char* operand_variable)
+uint32_t Expression::GetOperandCode(const char* operand_variable)
 {
 	if(operands == NULL)
 		operands = new CTrieTree<uint32_t>;
@@ -681,7 +681,7 @@ uint32_t CPostfixExpression::GetOperandCode(const char* operand_variable)
 	return code;
 }
 
-uint32_t CPostfixExpression::AddConstant(const float value)
+uint32_t Expression::AddConstant(const float value)
 {
 	uint32_t sequence = constant_float.size();
 	string variable = "#" + CTypeTool<uint32_t>::ToStr(sequence);
@@ -694,7 +694,7 @@ uint32_t CPostfixExpression::AddConstant(const float value)
 }
 
 // 说明：加入一个后缀表达式元素
-void CPostfixExpression::Push(ExpressionItem& ExpItem)
+void Expression::Push(ExpressionItem& ExpItem)
 {
 	if(ExpItem.enum_item_type == OPERAND)
 	{
@@ -706,7 +706,7 @@ void CPostfixExpression::Push(ExpressionItem& ExpItem)
 }
 
 // 说明：获取操作数
-uint32_t CPostfixExpression::GetOperands(map<string, uint32_t>& mapOperands)
+uint32_t Expression::GetOperands(map<string, uint32_t>& mapOperands)
 {
 	for(int code = 1; code <= operands->GetKeyCount(); code++)
 	{
@@ -716,7 +716,7 @@ uint32_t CPostfixExpression::GetOperands(map<string, uint32_t>& mapOperands)
 }
 
 // 说明：输入表达式中各个操作数的值，计算结果
-bool CPostfixExpression::Operate(const map<string, int32_t>& mapOperandValue, int32_t& Result)
+bool Expression::Operate(const map<string, int32_t>& mapOperandValue, int32_t& Result)
 {
 	if(operands->GetKeyCount() > mapOperandValue.size() + constant_int.size())
 		return false;
@@ -786,7 +786,7 @@ bool CPostfixExpression::Operate(const map<string, int32_t>& mapOperandValue, in
 	return true;
 }
 
-bool CPostfixExpression::Operate(const map<string, float>& mapOperandValue, float& Result)
+bool Expression::Operate(const map<string, float>& mapOperandValue, float& Result)
 {
 	if(operands->GetKeyCount() > mapOperandValue.size() + constant_float.size())
 		return false;
@@ -877,11 +877,11 @@ bool CPostfixExpression::Operate(const map<string, float>& mapOperandValue, floa
 	return true;
 }
 
-bool CPostfixExpression::IsActive()
+bool Expression::IsActive()
 {
 	return operands->GetKeyCount() > 0; 
 }
 
-//void CPostfixExpression::GetOperators(map<OperatorType, pair<OperatorParameter, uint32_t> >& operators)
+//void Expression::GetOperators(map<OperatorType, pair<OperatorParameter, uint32_t> >& operators)
 //{
 //}

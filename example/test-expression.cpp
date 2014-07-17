@@ -1,45 +1,58 @@
 #include <iostream>
 #include <sstream>
-using namespace std;
-
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include "./algorithm/expression.h"
+using namespace std;
+using namespace boost::algorithm;
+using namespace kaijiang;
+using boost::lexical_cast;
 
 int main(int c, char** v)
 {
 	string line1, line2;
-	kaijiang::CExpressionParser* parser = new kaijiang::CExpressionParser; 
-	kaijiang::CPostfixExpression* expression = NULL;
-	while(getline(cin, line1) && getline(cin, line2))
-	{
-		expression = parser->ParseNifixExp(line1);
-		if(expression == NULL)
-		{
-			cerr<<"parse expression error."<<endl;
-			continue;
-		}
-		stringstream stream;
-		stream.str(line2);
-		string variable;
-		float value;
-		map<string, float> operand;
-		while(stream>>variable>>value)
-		{
-			cout<<variable<<" = "<<value<<endl;
-			operand[variable] = value;
-		}
-		float result = 0;
-		cout<<"[INFO] parse successfully!! the expression: ";
-		expression->print(cout);
-		cout<<endl;
-		if(!expression->Operate(operand, result))
-		{
-			cerr<<"operate error."<<endl;
-			delete expression;
-			continue;
-		}
-		cerr<<"result = "<<result<<endl;
-		delete expression;
-	}
+	ExpressionParser* parser = new ExpressionParser; 
+	Expression* expression = NULL;
+    string input;
+    cout << "this is a expression work demo, I accept expression like this:" << endl;
+    cout << "$a + $b * 4" << endl;
+    cout << "please input expression, (input exit to exit):" << endl;
+    while(getline(cin, input) && input != "exit")
+    {
+        expression = parser->Parse(input);
+        if(expression == NULL)
+        {
+            cout << "expression systax error, please go on inputing or exit." << endl;
+            continue;
+        }
+        cout << "please input variables' value like this: a = 3, b = 5" << endl;
+        getline(cin, input);
+        map<string, float> operand;
+        vector<string> splites;
+        split(splites, input, is_any_of(","), token_compress_on);
+        for(auto &s : splites)
+        {
+            size_t i = s.find("=");
+            if(i == s.npos) continue;
+            string v = s.substr(0, i);
+            trim(v);
+            string vv = s.substr(i + 1, s.size() - i - 1);
+            trim(vv);
+            operand[v] = lexical_cast<float>(vv);
+        }
+        float result = 0.0;
+        if(!expression->Operate(operand, result))
+        {
+            cout << "I think you maybe miss some variables' value, so I can't get result." << endl;
+            delete expression;
+            cout << "please input expression, (input exit to exit):" << endl;
+            continue;
+        }
+        cout << "result = " << result << endl;
+        cout << "please input expression, (input exit to exit):" << endl;
+        delete expression;
+    }
 
-	return 0;
+    delete parser;
+    return 0;
 }
